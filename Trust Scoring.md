@@ -2,10 +2,7 @@ Each extension receives a trust score from 0-100:
 
 |Score|Risk Level|Action|
 |--|--|--|
-|80-100|Low Risk|Safe to install|
-|60-79|Medium Risk|Review recommended|
-|40-59|High Risk|Install with Caution|
-|0-39|Critical Risk|Do not install|
+|80-100|Low Risk|Safe to install||60-79|Medium Risk|Review recommended||40-59|High Risk|Install with Caution||0-39|Critical Risk|Do not install|
 
 Scoring penalties:
 * Critical finding: -35 points
@@ -25,16 +22,7 @@ The scanner automatically categorizes extensions and adjusts expectations:
 
 |Category|Examples|Expected Behaviors|
 |--|--|--|
-|AI Assistant|Copilot, Codeium, Kilo Code|Network, process spawn, env access|
-|Language Support|ms-python, rust-analyzer, Go|Process spawn, dynamic require|
-|Developer Tools|Code Runner, REST Client, Live Server|Process spawn, network requests|
-|Remote Development|Remote-SSH, Dev Containers, WSL|SSH, network, process spawn|
-|Testing|Jest Runner, Test Explorer|Process spawn|
-|Notebook|Jupyter|Kernel spawn, network|
-|Debugger|Node Debug, Python Debug|Process spawn|
-|Linter|ESLint, Prettier|Process spawn|
-|SCM|GitLens, Git Graph|Git credentials access|
-|Theme|Color themes, icon themes|Minimal runtime|
+|AI Assistant|Copilot, Codeium, Kilo Code|Network, process spawn, env access||Language Support|ms-python, rust-analyzer, Go|Process spawn, dynamic require||Developer Tools|Code Runner, REST Client, Live Server|Process spawn, network requests||Remote Development|Remote-SSH, Dev Containers, WSL|SSH, network, process spawn||Testing|Jest Runner, Test Explorer|Process spawn||Notebook|Jupyter|Kernel spawn, network||Debugger|Node Debug, Python Debug|Process spawn||Linter|ESLint, Prettier|Process spawn||SCM|GitLens, Git Graph|Git credentials access||Theme|Color themes, icon themes|Minimal runtime|
 
 **Real-World Attack Prevention**
 
