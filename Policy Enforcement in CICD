@@ -1,0 +1,17 @@
+//create .ai-plugin-scanner.json
+
+{
+  "version": "1.0",
+  "policy": {
+    "blocklist": [
+      "known.malicious.extension",
+      "another.suspicious.extension"
+    ],
+    "rules": {
+      "minTrustScore": { "threshold": 70, "action": "block" },
+      "blockObfuscated": { "enabled": true, "action": "warn" },
+      "requireVerifiedPublisher": { "enabled": true, "action": "info" },
+      "maxSeverity": { "threshold": "medium", "action": "block" }
+    }
+  }
+}
