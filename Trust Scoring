@@ -198,15 +198,7 @@ https://www.reversinglabs.com/products/software-supply-chain-security
 VSCan - Web-based extension analyzer
 https://vscan.dev/
 
-🙏 Acknowledgments
-This project builds upon excellent research and tools from:
 
-Trail of Bits (vsix-audit)
-Datadog Security Labs (IDE-SHEPHERD)
-Koi Security (MaliciousCorgi research)
-ReversingLabs (malicious extension research)
-Aikido Security (ClawdBot investigation)
-Microsoft VS Code Team
 📊 Project Status
 This project is actively maintained. See CHANGELOG.md [blocked] for recent updates.
 
