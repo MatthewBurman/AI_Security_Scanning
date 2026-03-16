@@ -1,0 +1,11 @@
+# Install YARA-X (required for YARA rules)
+brew install yara-x
+
+# Install the scanner
+npm install -g ai-plugin-scanner
+
+# Or build from source
+git clone https://github.com/your-username/ai-plugin-scanner.git
+cd ai-plugin-scanner
+npm install
+npm run build
