@@ -30,18 +30,12 @@ Examines extension manifests for suspicious configurations:
 |Check|What It Detects|Severity|
 |---|---|---|
 |Blocklist|Extension ID matches known malicious extensions|Critical|
-
 |Wildcard activation	activation|Events: ["*"] - runs on every action|High|
-
 |Startup activation|onStartupFinished - runs at VS Code launch|Medium|
-
 |Theme with code|Theme extension that has a main entry point|High|
-
 |Malicious npm packages|Dependencies matching known malware packages|Critical|
-
 |Typosquatting|Dependencies within edit distance 1-2 of popular packages|High|
-
-|Lifecycle scripts|preinstall/postinstall scripts with suspicious patterns|Critical/Medium
+|Lifecycle scripts|preinstall/postinstall scripts with suspicious patterns|Critical/Medium|
 
 3. Indicators of Compromise (IOCs)
 Matches against curated threat intelligence:
