@@ -1,0 +1,14 @@
+# Recursively scan all .vsix files in a directory
+ai-plugin-scanner scan --recursive ./extensions-folder
+
+# Filter by minimum severity
+ai-plugin-scanner scan --severity high
+
+# Parallel scanning (default: 4 jobs)
+ai-plugin-scanner scan --recursive --jobs 8 ./extensions
+
+# Force re-download from marketplace
+ai-plugin-scanner scan --force ms-python.python
+
+# Disable network checks
+ai-plugin-scanner scan --no-network ./extension.vsix
