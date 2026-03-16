@@ -199,12 +199,4 @@ VSCan - Web-based extension analyzer
 https://vscan.dev/
 
 
-📊 Project Status
-This project is actively maintained. See CHANGELOG.md [blocked] for recent updates.
-
-🆘 Support
-Issues: GitHub Issues
-Discussions: GitHub Discussions
-Security vulnerabilities: security@example.com
-Documentation: Wiki
 ⚠️ Disclaimer: This tool provides strong protections but cannot guarantee 100% detection. Always follow security best practices and exercise caution when installing extensions or opening untrusted workspaces. No security tool is perfect, and new attack techniques emerge regularly. Use this as part of a comprehensive security strategy.
