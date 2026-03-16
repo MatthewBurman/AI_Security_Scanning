@@ -1,0 +1,19 @@
+# Scan all installed VS Code extensions
+ai-plugin-scanner scan
+
+# Scan a specific extension by ID
+ai-plugin-scanner scan publisher.extension-name
+
+# Scan from VSIX file
+ai-plugin-scanner scan ./extension.vsix
+
+# Scan from different marketplaces
+ai-plugin-scanner scan marketplace:ms-python.python
+ai-plugin-scanner scan openvsx:redhat.java
+ai-plugin-scanner scan cursor:extension-name
+
+# Output as JSON for integration
+ai-plugin-scanner scan --format json -o report.json
+
+# Output as SARIF for GitHub Code Scanning
+ai-plugin-scanner scan --format sarif -o results.sarif
