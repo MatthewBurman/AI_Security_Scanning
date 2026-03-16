@@ -15,3 +15,11 @@
     }
   }
 }
+
+//run audit in CI
+
+# Fail if any blocking violations
+ai-plugin-scanner audit --config .ai-plugin-scanner.json
+
+# Fail on warnings too
+ai-plugin-scanner audit --fail-on warn
